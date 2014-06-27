@@ -1,21 +1,18 @@
 #!/usr/bin/perl
 use Cwd;
 use File::Path;
-use GetOpt::Long;
 
 #/************ Setting Environment Variables *******************/
 $ENV{'CCM_HOME'}="/opt/ccm71";
 $ENV{'PATH'}="$ENV{'CCM_HOME'}/bin:$ENV{'PATH'}";
+open(ccm_addr,"$ENV{'CCM_HOME'}/bin/ccm start -m -q -d /ccm/ccmdb/adg -h ccmindia1 -nogui |");
+$ENV{'CCM_ADDR'}=<ccm_addr>;
+close(ccm_addr);
 $CCM="$ENV{'CCM_HOME'}/bin/ccm";
 $GIT="/usr/bin/git";
 #/***************************************************************/
 
-open(ccm_addr,"$ENV{'CCM_HOME'}/bin/ccm start -m -q -d /ccm/ccmdb/adg -h ccmindia1 -nogui |");
-$ENV{'CCM_ADDR'}=<ccm_addr>;
-close(ccm_addr);
-
 $wd=cwd();
-
 print "Before creating git repo please run the following \n\n";
 print "git config --global user.email \"you@evolving.com\"\n";
 print "git config --global user.name \"Your Name\" \n\n";

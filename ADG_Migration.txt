@@ -1,0 +1,42 @@
+Customer Assembly Project : AirtelIndia7.6DSA/1.0       [SQA Project type]
+
+Agent Projects and respective releases: 
+------------------- Subprojects currently -------------------------
+OracleDb_PA/2.7
+ADG_TclUtils/1.27
+AdgRun/1.0
+Generic_HTTP_SA_LIB/1.1
+GPLv2/1.0
+Smarttrust_SIM_PA_SIM/1.0
+XML_RPC_SA/1.1
+XML_RPC_SA_SIM/1.0
+--------------------- Projects having already different Assemblies ---------------------------
+
+Product Release(Integrate)
+ADG_PA_Batch_Aggregator/2.0.0
+ADG_Virtual_File_System/2.0.0
+SOAP_DISPATCH_PA_LIB/1.3.0
+-----------------------------------------------------------------------------------------------------
+
+Smarttrust_SIM_PA/1.0.0
+Smarttrust_SIM_PA/2.0.0
+Smarttrust_SIM_PA/3.0.0
+ 
+
+
+Product Release(Integrate)
+
+Customer Release(SQA)
+AirtelIndia7.6DSA/1.0
+=> completed
+sub projects:(apply sub-branching)
+
+product 
+OracleDb_PA/2.7
+ADG_TclUtils/1.27
+AdgRun/1.0
+Generic_HTTP_SA_LIB/1.1
+GPLv2/1.0
+Smarttrust_SIM_PA_SIM/1.0
+XML_RPC_SA/1.1
+XML_RPC_SA_SIM/1.0
