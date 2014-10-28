@@ -88,7 +88,7 @@ foreach $i (keys %crs)
 	print HTML "</tbody>";
 	print HTML "</body></html>";
 	close HTML;
-	system("/usr/local/bin/mutt -s 'Defect List for $i' '$list' -a '$wd/$i.html' < /dev/null");
+	#system("/usr/local/bin/mutt -s 'Defect List for $i' '$list' -a '$wd/$i.html' < /dev/null");
 	}
 	else
 	{

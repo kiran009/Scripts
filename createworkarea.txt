@@ -1,0 +1,4 @@
+export CCM_HOME=/opt/ccm71
+export PATH=$CCM_HOME/bin:$PATH
+export CCM_ADDR=`ccm start -d /ccm/ccmdb/adgtest1 -q -nogui`
+ccm work_area /cb -p <project>
