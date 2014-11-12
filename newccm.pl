@@ -28,14 +28,8 @@ main();
 sub main()
 {
 	start_ccm();
-	query_cr();
-	#fetch_readme();
-	#read_readme();
-	#fetch_crs();
-	#reconfigure_dev_proj_and_compile();
-	#reconfigure_del_project();
-	#find_binaries_tar();
-	#send_email();
+	query_cr();  #fetch_readme();	#read_readme();	#fetch_crs();	#reconfigure_dev_proj_and_compile();#reconfigure_del_project();	#find_binaries_tar();
+	send_email();
 	#move_cr_status();
 	ccm_stop();
 	exit;
@@ -129,6 +123,7 @@ sub fetch_crs()
 				$projectName="DSA_FUR_Delivery-patch_".$platform."_".$PatchReleaseVersion;
 				reconfigure_del_project();
 			}
+			find_binaries_tar();
 		}
 		case "4.1.0" 
 		{
@@ -145,6 +140,7 @@ sub fetch_crs()
 				$projectName="DSA_FUR_Delivery-patch_".$platform."_".$PatchReleaseVersion;
 				reconfigure_del_project();
 			}
+			find_binaries_tar();
 		}		
 		
 	}
@@ -233,7 +229,7 @@ sub find_binaries_tar()
 	print "\$ftpdir is: $ftpdir \n";
 	#chdir $ftpdir;
 	chomp($patch_number);
-	`cd $ftpdir; rm -f Patch\_$patch_number\*;tar cvf Patch_$patch_number.tar bin; gzip -f \*\.tar`;		
+	`cd $ftpdir; rm -f Patch\_$patch_number\*;tar cvf Patch_$platform_$patch_number.tar bin; gzip -f \*\.tar`;		
 }
 
 
@@ -244,7 +240,7 @@ sub send_email()
 
 sub move_cr_status()
 {
-
+	print "In Move CR status \n";
 }
 sub ccm_stop()
 {
