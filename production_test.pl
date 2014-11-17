@@ -18,6 +18,7 @@ my @CRS,@crs,@tasks,$CRlist;
 $PatchReleaseVersion;
 $projectName;
 $platformlist;
+$hostname;
 @platforms;
 $ftpdir="/u/kkdaadhi/Patch_$patch_number";
 $mailto='kiran.daadhi@evolving.com';
@@ -102,7 +103,7 @@ sub fetch_crs()
 {
 	@CRS=`sed -n '/FIXES/,/AFFECTS/ p' $patch_number\_README.txt  | sed '\$ d' | grep -v 'FIXES' | sed '/^\$/d'`;
 	chomp(@CRS);
-	$PatchReleaseVersion=`grep "AFFECTS" $patch_number\_README.txt | awk '{print $3}'`;
+	$PatchReleaseVersion=`grep 'AFFECTS' $patch_number\_README.txt | awk '{print \$3}'`;
 	$PatchReleaseVersion=~ s/^\s+|\s+$//g;
 	foreach (@CRS)
 	{
@@ -121,10 +122,11 @@ sub fetch_crs()
         $properties{$key}=$value;
 	}
 	close OP;
-	foreach $key(keys %properties)
-	{
-        print "key=>value\t $key=>$properties{$key}\n";
-	}
+	# foreach $key(keys %properties)
+	# {
+        # print "key=>value\t $key=>$properties{$key}\n";
+	# }
+	print "\$PatchReleaseVersion is: $PatchReleaseVersion \n";
 	switch($PatchReleaseVersion)
 	{
 		case "4.0.0" 
@@ -136,7 +138,14 @@ sub fetch_crs()
 			foreach $platform(@platforms)
 			{
 				# To be built on machine
-				$hostname=$properties{'$platform\_HOST'};
+				chomp($platform);
+				$hostname=$properties{'$platform'.'_HOST'};
+				$key=$platform.'_HOST';
+				print "\$key value is: $key<<<\n";
+				print ">>>> $properties{'linAS5_HOST'} \t $properties{'$key'} and $platform AND $hostname>>>>\n";
+				ccm_stop();
+				exit;
+				$hostname=~ s/^\s+|\s+$//g;				
 				$projectName="DSA_FUR_Dev-patch_".$platform."_".$PatchReleaseVersion;
 				reconfigure_dev_proj_and_compile();	
 				$projectName="DSA_FUR_Delivery-patch_".$platform."_".$PatchReleaseVersion;
@@ -192,14 +201,13 @@ sub find_binaries_tar()
         	push(@newdir,$dir);
 	        `mkdir -p $dir`;
 	}
-
 	while(($key,$value)=each %hash) {
         	`cp -f $key $value`;
 	}
 	print "\$ftpdir is: $ftpdir \n";
 	#chdir $ftpdir;
 	chomp($patch_number);
-	`cd $ftpdir; rm -f Patch\_$patch_number\*;tar cvf Patch_$platform_$patch_number.tar bin; gzip -f \*\.tar`;		
+	`cd $ftpdir; rm -f Patch\_$patch_number\*;tar cvf Patch_$platform\_$patch_number.tar bin; gzip -f \*\.tar`;		
 }
 
 sub start_ccm()
@@ -233,7 +241,8 @@ sub reconfigure_dev_proj_and_compile()
 	# Set the CCM workarea 
 	$ccmworkarea=`$CCM wa -show -recurse $projectName`;
 	($temp,$workarea)=split(/'/,$ccmworkarea);
-	print "***************CCM WorkArea is: $workarea\n***************";
+	$workarea=~ s/^\s+|\s+$//g;
+	print "***************CCM WorkArea is: $workarea and \$hostsname value is: $hostname\n***************";
 
 	`$CCM folder -modify -add_task @tasks 2>&1 1>/dev/null`;
 	`$CCM reconfigure -rs -r -p $projectName 2>&1 1>/data/ccmbm/final_script/kiran_test/reconfigure_devproject.log`;
@@ -241,7 +250,7 @@ sub reconfigure_dev_proj_and_compile()
 	# Go to pedlinux5 and gmake clean all
 	#`OST "cd $ccmworkarea; /usr/bin/gmake clean all;"`;
 	chdir "$workarea/DSA_FUR_Dev";
-	`rsh $hostname 'cd $ccmworkarea/DSA_FUR_Dev; /usr/bin/gmake clean all 2>&1 1>/data/ccmbm/final_script/kiran_test/gmake.log'`;
+	`rsh $hostname 'cd $workarea/DSA_FUR_Dev; /usr/bin/gmake clean all 2>&1 1>/data/ccmbm/final_script/kiran_test/gmake.log'`;
 }
 sub reconfigure_del_project()
 {
