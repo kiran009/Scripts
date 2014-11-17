@@ -12,7 +12,7 @@ $CCM="$ENV{'CCM_HOME'}/bin/ccm";
 $Scripts_Dir="/data/ccmbm/final_script/kiran_test";
 $database="/data/ccmdb/dsa/";
 $dbbmloc="/data/ccmbm/dsa/";
-my @PatchFiles,@files,$patchno;
+my @PatchFiles,@files;
 my $patch_number,$problem_number;
 my @CRS,@crs,@tasks,$CRlist;
 $PatchReleaseVersion;
@@ -31,8 +31,8 @@ sub main()
 {
 	start_ccm();
 	query_cr(); 
-	send_email();
-	create_childcrs();
+	#send_email();
+	#create_childcrs();
 	move_cr_status();
 	ccm_stop();
 	exit;
@@ -41,18 +41,26 @@ sub main()
 sub query_cr()
 {
 	# Get the list of CRs in 'Implemented' State
+	chdir $Scripts_Dir;
 	@ccm_query=`$CCM query "cvtype='problem' and crstatus='Implemented' and problem_number='3654'"`;
 	@ccm_fmt=`$CCM query -u -f %problem_number,%patch_number`;
 	$devId=`$CCM query -u -f %resolver`;
 	foreach(@ccm_fmt)
 	{
 		($problem_number,$patch_number)=split(/,/,$_);
-		$ccm_qry=`$CCM query "cvtype='problem' and crstatus='Implemented' and patch_number='$patch_number'"`;
+		print "\$problem_number is: $problem_number and \$patch_number is: $patch_number \n";
+		chomp($patch_number);
+		chomp($problem_number);
+		#$ccm_qry=`$CCM query "cvtype='problem' and crstatus='Implemented' and patch_number=$patch_number"`;
+		#print "\$ccm_qry is: $ccm_qry \n";
+		$patch_number=~ s/^\s+|\s+$//g; 	
+		$problem_number=~ s/^\s+|\s+$//g; 	
 		$patchreadme=`$CCM query -u -f %patch_readme`;
-		open OP,"+> $patchno\_README.txt";
+		print "$patchreadme \n";
+		open OP,"+> $patch_number\_README.txt";
 		print OP $patchreadme;
 		close OP;
-		`dos2unix $patchno\_README.txt 2>&1 1>/dev/null`;		
+		`dos2unix $patch_number\_README.txt 2>&1 1>/dev/null`;		
 	}	
 	read_readme();
 	fetch_crs();
@@ -92,7 +100,6 @@ sub read_readme()
 }
 sub fetch_crs()
 {
-	chdir $Scripts_Dir;
 	@CRS=`sed -n '/FIXES/,/AFFECTS/ p' $patch_number\_README.txt  | sed '\$ d' | grep -v 'FIXES' | sed '/^\$/d'`;
 	chomp(@CRS);
 	$PatchReleaseVersion=`grep "AFFECTS" $patch_number\_README.txt | awk '{print $3}'`;
@@ -197,6 +204,7 @@ sub find_binaries_tar()
 
 sub start_ccm()
 {
+	print "In Start CCM \n";
 	open(ccm_addr,"$ENV{'CCM_HOME'}/bin/ccm start -d $database -m -q -r build_mgr -h ccmuk1 -nogui |");
 	$ENV{'CCM_ADDR'}=<ccm_addr>;
 	close(ccm_addr);
@@ -213,6 +221,7 @@ sub move_cr_status()
 }
 sub ccm_stop()
 {
+	print "In Stop CCM \n";
 	open(ccm_addr,"$ENV{'CCM_HOME'}/bin/ccm stop |");
 	close(ccm_addr);
 }

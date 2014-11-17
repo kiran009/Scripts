@@ -10,7 +10,7 @@ $ENV{'CCM_HOME'}="/opt/ccm71";
 $ENV{'PATH'}="$ENV{'CCM_HOME'}/bin:$ENV{'PATH'}";
 $CCM="$ENV{'CCM_HOME'}/bin/ccm";
 $Scripts_Dir="/data/ccmbm/final_script/kiran_test";
-$database="/data/ccmdb/dsa/";
+$database="/data/ccmdb/dsa/";#$database="/data/ccmdb/provident";
 $dbbmloc="/data/ccmbm/dsa/";
 my @PatchFiles,@files,$patchno;
 my $patch_number,$problem_number;
@@ -30,7 +30,7 @@ main();
 sub main()
 {
 	start_ccm();
-	query_cr(); 
+	query_cr();  #fetch_readme();	#read_readme();	#fetch_crs();	#reconfigure_dev_proj_and_compile();#reconfigure_del_project();	#find_binaries_tar();
 	send_email();
 	create_childcrs();
 	move_cr_status();
@@ -41,7 +41,7 @@ sub main()
 sub query_cr()
 {
 	# Get the list of CRs in 'Implemented' State
-	@ccm_query=`$CCM query "cvtype='problem' and crstatus='Implemented' and problem_number='3654'"`;
+	@ccm_query=`$CCM query "cvtype='problem' and crstatus='Implemented'"`;
 	@ccm_fmt=`$CCM query -u -f %problem_number,%patch_number`;
 	$devId=`$CCM query -u -f %resolver`;
 	foreach(@ccm_fmt)
@@ -204,7 +204,7 @@ sub start_ccm()
 
 sub send_email()
 {
-	system("/usr/bin/mutt -s 'FUR PATCH BUILD COMPLETED and available at: /u/kkdaadhi/' -a /data/ccmbm/final_script/kiran_test/gmake.log -a /data/ccmbm/final_script/kiran_test/reconfigure_devproject.log -a /data/ccmbm/final_script/kiran_test/reconfigure_delproject.log $mailto < /dev/null ");
+	system("/usr/bin/mutt -s 'FUR PATCH BUILD COMPLETED and available at: /u/kkdaadhi/' -a /tmp/gmake.log -a /tmp/reconfigure_devproject.log -a /tmp/reconfigure_delproject.log $mailto < /dev/null ");
 }
 
 sub move_cr_status()
@@ -227,12 +227,12 @@ sub reconfigure_dev_proj_and_compile()
 	print "***************CCM WorkArea is: $workarea\n***************";
 
 	`$CCM folder -modify -add_task @tasks 2>&1 1>/dev/null`;
-	`$CCM reconfigure -rs -r -p $projectName 2>&1 1>/data/ccmbm/final_script/kiran_test/reconfigure_devproject.log`;
+	`$CCM reconfigure -rs -r -p $projectName 2>&1 1>/tmp/reconfigure_devproject.log`;
 
 	# Go to pedlinux5 and gmake clean all
 	#`OST "cd $ccmworkarea; /usr/bin/gmake clean all;"`;
 	chdir "$workarea/DSA_FUR_Dev";
-	`rsh $hostname 'cd $ccmworkarea/DSA_FUR_Dev; /usr/bin/gmake clean all 2>&1 1>/data/ccmbm/final_script/kiran_test/gmake.log'`;
+	`rsh $hostname 'cd $ccmworkarea/DSA_FUR_Dev; /usr/bin/gmake clean all 2>&1 1>/tmp/gmake.log'`;
 }
 sub reconfigure_del_project()
 {
@@ -240,5 +240,5 @@ sub reconfigure_del_project()
 	$ccmworkarea=`$CCM wa -show -recurse $projectName`;
 	($temp,$workarea)=split(/'/,$ccmworkarea);
 	print "***************CCM WorkArea of Delivery Project is: $workarea***************\n";	
-	`$CCM reconfigure -rs -r -p $projectName 2>&1 1>/data/ccmbm/final_script/kiran_test/reconfigure_delproject.log`;
+	`$CCM reconfigure -rs -r -p $projectName 2>&1 1>/tmp/reconfigure_delproject.log`;
 }
